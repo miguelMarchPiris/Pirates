@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Boat
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Mar
+    uniqueID: 2971863711
+    locked: 0
+  - name: Cubierta
+    uniqueID: 4128521083
+    locked: 0
+  - name: Objetos
+    uniqueID: 3633464687
+    locked: 0
+  - name: Sangre
+    uniqueID: 2331036411
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
