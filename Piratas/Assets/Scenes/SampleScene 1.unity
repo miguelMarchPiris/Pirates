@@ -7151,6 +7151,8 @@ MonoBehaviour:
   max_velocity_x: 10
   jump_away_from_danger_velocity: 25
   margen: 1
+  MAX_VELOCITY: 30
+  MAX_ANGULAR_VELOCITY: 60.94
   factor_freno_eje_x: 0.01
 --- !u!1 &1670083855
 GameObject:

@@ -15,6 +15,8 @@ public class Movement_Script : MonoBehaviour
     bool left = false;
     bool right = false;
 
+    bool max_velocity = false;
+    bool max_angular_velocity = false;
 
 
     public float factor_turn_drag = 0.1f;
@@ -26,6 +28,7 @@ public class Movement_Script : MonoBehaviour
     public float jump_away_from_danger_velocity = 25f;
     public float margen = 1f;
     public float MAX_VELOCITY = 30f;
+    public float MAX_ANGULAR_VELOCITY = 30f;
 
     float direccion_giro;
 
@@ -60,6 +63,7 @@ public class Movement_Script : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        CheckMaxVelocity();
         Move();
         TurnDrag();
 
@@ -87,28 +91,31 @@ public class Movement_Script : MonoBehaviour
         }
         //if (CheckMaxVelocity()){rigidb.AddForce(new Vector2(direccion_x * lateral_force, 0f), ForceMode2D.Force);}
 
-        //, ForceMode2D.Force);
-        //(direccion_x * lateral_force, 0f, ForceMode2D.Force);
-        float factor_torque = Sigmoide(rigidb.velocity.magnitude/ MAX_VELOCITY); // no funciona del todo bien
+        float actual_max_ang_vel = Sigmoide(rigidb.velocity.magnitude / MAX_VELOCITY) * MAX_ANGULAR_VELOCITY;
+        max_angular_velocity = Mathf.Abs(rigidb.angularVelocity) >= actual_max_ang_vel;
+        
         rigidb.AddTorque(direccion_giro * torque );
+        Debug.Log("Angular velocity: " + rigidb.angularVelocity);
+        Debug.Log("MAX Angular velocity: " + actual_max_ang_vel);
+        if (max_angular_velocity)
+        {
+            float d = 1f;
+            if (rigidb.angularVelocity < 0)
+                d = -1f;
+
+            rigidb.angularVelocity = actual_max_ang_vel * d;
+        }
+
 
         //rigidb.angularVelocity += incremento_rotacion*direccion_giro;
 
         if (front)
         {
-            //rigidb.velocity = new Vector2(rigidb.velocity.x, jump_velocity);
-
             //rigidb.velocity = new Vector2(Mathf.Sin(Mathf.Deg2Rad * rigidb.rotation) * (-movement_force), Mathf.Cos(Mathf.Deg2Rad * rigidb.rotation) * movement_force);
             //rigidb.AddForce(new Vector2(Mathf.Sin(Mathf.Deg2Rad * rigidb.rotation) * (-movement_force), Mathf.Cos(Mathf.Deg2Rad * rigidb.rotation) * movement_force));
             
             rigidb.AddRelativeForce(empuje);
 
-            
-            //rigidb.AddRelativeForce
-            
-            //rigidb.rotation
-            //rigidb.velocity += Vector2.up * jump_velocity;
-            //rigidb.AddForce(new Vector2(0f, jump_force), ForceMode2D.Impulse);
         }
         if (back)
         {
@@ -139,8 +146,28 @@ public class Movement_Script : MonoBehaviour
         //      rozamiento = abs_sin_diff * velocidad * (vector opuesto a la direccion de la velocidad)
         Vector2 drag = Mathf.Pow(sin_dif,2) * vel.magnitude * (-1f * vel.normalized) ;
         drag = drag * factor_turn_drag;
-        rigidb.AddForce(drag);
+        
+          
+         if (sin_dif < 0.05 && left == right)
+         {
+            Debug.Log("Velocity a:" + rigidb.velocity);
+            Debug.Log("Velocity ________:" +rigidb.velocity.magnitude);
+            rigidb.velocity = transform.TransformVector(empuje).normalized * rigidb.velocity.magnitude;
+            
+            Debug.Log("Velocity d:" + rigidb.velocity);
+        }
+        else
+        {
+            rigidb.AddForce(drag);
+        }
+        
+        
+        
 
+
+
+        //DEBUG
+        Debug.Log("Sin_Dif: " + sin_dif);
         //Debug.Log("Dir: "+ rot+ " Vel: "+ ang+ " Dir-Vel: " +(rot-ang));
         //Debug.Log("Sin: "+Mathf.Sin(Mathf.Deg2Rad*(rot - ang)));
         Debug.DrawRay(rigidb.position, vel  , Color.green);
@@ -157,12 +184,10 @@ public class Movement_Script : MonoBehaviour
             frente = new Vector2(0, 0);
         }
         Debug.DrawRay(rigidb.position, frente + drag, Color.magenta);
-
         
-        Debug.Log(transform.forward);
         //Debug.DrawRay(rigidb.position, transform.rotation, Color.red);
-        Debug.Log("Velocity:" + vel + "Angulo vel:1 "+ ang);
-        Debug.Log("Velocity:" + vel + "Angulo vel:2 " + ang2);
+        //Debug.Log("Velocity:" + vel + "Angulo vel:1 "+ ang);
+        //Debug.Log("Velocity:" + vel + "Angulo vel:2 " + ang2);
     }
     private float ModAngle(float angle)
     {
@@ -182,10 +207,15 @@ public class Movement_Script : MonoBehaviour
         right = false;
         front = false;
         back = false;
+
+        max_velocity = false;
+        max_angular_velocity = false;
     }
-    private bool CheckMaxVelocity()
+    private void CheckMaxVelocity()
     {
-        return !(Mathf.Abs(rigidb.velocity.x) >= max_velocity_x & direccion_giro * rigidb.velocity.x > 0f);
+        //return !(Mathf.Abs(rigidb.velocity.x) >= max_velocity_x & direccion_giro * rigidb.velocity.x > 0f);
+        max_velocity = rigidb.velocity.magnitude >= MAX_VELOCITY;
+        
         //return true;
     }
     private float Sigmoide(float x)
